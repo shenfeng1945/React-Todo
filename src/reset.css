@@ -5,3 +5,8 @@ ol,ul{
    list-style:none;
 }
 a{color:inherit;}
+.icon{
+   width:25px;
+   height:25px;
+   vertical-align:middle;
+}
