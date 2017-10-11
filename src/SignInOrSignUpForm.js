@@ -42,5 +42,7 @@ export default class SignInOrSignUpForm extends Component {
       this.setState({
           selected:e.target.value
       })
+        let condition = e.target.value
+        window.localStorage.setItem('condition',condition)
     }
 }

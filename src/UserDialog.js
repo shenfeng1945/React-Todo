@@ -13,15 +13,24 @@ export default class UserDialog extends Component {
                 username:'',
                 email:'',
                 password:''
-            }
+            },
+            selected:'signUp'
         }
+    }
+    componentWillMount(){
+        let condition = window.localStorage.getItem('condition')
+        console.log(condition)
+        let stateCopy = copyByJSON(this.state)
+        stateCopy.selected = condition
+        this.setState(stateCopy)
     }
     render() {
         return (
             <div className="UserDialog-Wrapper">
                 <div className="UserDialog">
+                    <div className="logo">Days Todo</div>
                     {this.state.selectedTab === 'signInOrSignUp' ?
-                        <SignInOrSignUpForm formData={this.state.formData}
+                        <SignInOrSignUpForm formData={this.state.formData} selected={this.state.selected}
                         onSignUp={this.signUp.bind(this)}
                         onSignIn={this.signIn.bind(this)}
                         onForgotPassword={this.showForgotPassword.bind(this)}
@@ -83,9 +92,13 @@ export default class UserDialog extends Component {
         })
     }
     returnSignIn(){
-        this.setState({
-            selectedTab:'signInOrSignUp'
-        })
+        let stateCopy = copyByJSON(this.state)
+        stateCopy.selectedTab = 'signInOrSignUp'
+        stateCopy.selected = 'signIn'
+        this.setState(stateCopy)
+        // this.setState({
+        //     selectedTab:'signInOrSignUp'
+        // })
     }
     resetPassword(e){
         e.preventDefault()
