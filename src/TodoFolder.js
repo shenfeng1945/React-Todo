@@ -1,5 +1,6 @@
 import React , {Component} from 'react'
 import $ from 'jquery'
+import './TodoFolder.css'
 export default class TodoFolder extends Component {
     constructor(props) {
         super(props);
@@ -23,12 +24,17 @@ export default class TodoFolder extends Component {
     }
     render() {
         return (
-            <div className="todoFolderItem">
+            <div className="todoFolderItem" onClick={this.onClick.bind(this)}>
                 <svg className="icon"><use xlinkHref="#icon-home"></use></svg>
                 <span className="todoFolderName">{this.props.todoFolderInfo.folderName}</span>
-                <span className="todoSum">{this.props.todoFolderInfo.todos.length}</span>
+                {/*<span className="todoSum">{this.props.todoFolderInfo.todos.length}</span>*/}
             </div>
         )
 
+    }
+    onClick(e){
+        // let folders = $('.todoFolderItem')
+        // folders.removeClass('active')
+        this.props.onClickFolder(this.props.index)
     }
 }
