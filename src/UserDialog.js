@@ -17,13 +17,12 @@ export default class UserDialog extends Component {
             selected:'signUp'
         }
     }
-    componentWillMount(){
-        let condition = window.localStorage.getItem('condition')
-        console.log(condition)
-        let stateCopy = copyByJSON(this.state)
-        stateCopy.selected = condition
-        this.setState(stateCopy)
-    }
+    // componentWillMount(){
+    //     let condition = window.localStorage.getItem('condition')
+    //     let stateCopy = copyByJSON(this.state)
+    //     stateCopy.selected = condition
+    //     this.setState(stateCopy)
+    // }
     render() {
         return (
             <div className="UserDialog-Wrapper">
