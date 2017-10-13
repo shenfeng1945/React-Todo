@@ -20,9 +20,18 @@
 section.content{
     flex:1;
 }
+.content ol.todoItem{
+    display: none;
+}
+.content ol.todoItem.active{
+    display: block;
+}
 .content .todoItemState{
     display: flex;
 }
-.content .todoItemState a{
+.content .todoItemState a.links{
    margin:0 5px;
+}
+.content .todoItemState a.links.active{
+   color:red;
 }
