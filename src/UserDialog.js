@@ -49,9 +49,10 @@ export default class UserDialog extends Component {
     }
     signUp(e){
         e.preventDefault()
+        let type='注册'
         let {email, username, password} = this.state.formData
         let success = (user) => {
-            this.props.onSignUp.call(null, user)
+            this.props.onSignUp.call(null, user,type)
         }
         let error = (error) => {
             switch (error.code) {
@@ -67,9 +68,10 @@ export default class UserDialog extends Component {
     }
     signIn(e){
         e.preventDefault()
+        let type='登录'
         let {username, password} = this.state.formData
         let success = (user) => {
-            this.props.onSignIn.call(null, user)
+            this.props.onSignIn.call(null, user,type)
         }
         let error = (error) => {
             switch (error.code) {
