@@ -22,7 +22,7 @@ class App extends Component {
             newFolder:'',
             curFolder:'',
             todoInfo:[
-                {folderName:'我的一天',userId:'',todos:[]}
+                {folderName:'我的一天',userId:'',todos:[],folderId:''}
             ],
             currentFolderIndex:0
         }
@@ -30,24 +30,25 @@ class App extends Component {
         let user = getCurrentUser()
         let error = (error)=>{console.log(error)}
         if (user) {
-            TodoModel.getByUser(user, (todos) => {
+
+            TodoModel.getFolder(user,(folders)=>{
+                let stateCopy = JSON.parse(JSON.stringify(this.state))
+                folders.forEach((item,index)=>{
+                   stateCopy.todoInfo[index]=item.attributes
+                    stateCopy.todoInfo[index].folderId=item.id
+                })
+                this.setState(stateCopy)
+                //folder加载完后,再加载todo
+                let folderId = this.state.todoInfo[this.state.currentFolderIndex]
+                TodoModel.getByUser(folderId, (todos) => {
                 let stateCopy = JSON.parse(JSON.stringify(this.state))
                 stateCopy.todoList = todos
                 this.setState(stateCopy)
             },error)
-            TodoModel.getFolder(user,(folders)=>{
-                let stateCopy = JSON.parse(JSON.stringify(this.state))
-                folders.forEach((item,index)=>{
-                    console.log(item)
-                   stateCopy.todoInfo[index]=item.attributes
-                })
-                this.setState(stateCopy)
-                console.log(this.state.todoInfo)
             })
         }
     }
     render() {
-        console.log(1)
         let todosAll = this.state.todoList.filter((item) => !item.deleted).map((item, index) => {
             return <li key={index}>
                 <TodoItem todo={item} onDelete={this.delete.bind(this)} onChange={this.toggle.bind(this)}/>
@@ -126,12 +127,14 @@ class App extends Component {
                     <UserDialog onSignUp={this.signInOrSignUp.bind(this)} onSignIn={this.signInOrSignUp.bind(this)}/>
                 }
                 {/*<CreateDialog onSubmit={this.addFolder.bind(this)}*/}
-                              {/*onCancel={this.cancelAddFolder.bind(this)}*/}
+                              {/*onCanccescel={this.cancelAddFolder.bind(this)}*/}
                               {/*newFolder={this.state.newFolder}*/}
                               {/*onChange={this.changeFolderTitle.bind(this)}/>*/}
                 <ContentDialog onAddFolder={this.onAddFolder.bind(this)} userId={this.state.user.id}/>
             </div>
         )
+    }
+    componentDidMount(){
     }
     onAddFolder(folder){
         let newFolder = {
@@ -164,7 +167,6 @@ class App extends Component {
                 let stateCopy = copyByJSON(this.state)
                 stateCopy.user = user
                 this.setState(stateCopy)
-                console.log(this.state.todoInfo)
             },(error)=>{})
         }
         let stateCopy = copyByJSON(this.state)
@@ -185,7 +187,7 @@ class App extends Component {
             status: '',
             deleted: false
         }
-        TodoModel.create(this.state.todoInfo[this.state.currentFolderIndex].userId,newTodo, (todo) => {
+        TodoModel.create(this.state.todoInfo[this.state.currentFolderIndex].folderId,newTodo, (todo) => {
             // newTodo.id = id
             // this.state.todoList.push(newTodo)
             // this.setState({
@@ -194,6 +196,7 @@ class App extends Component {
             // })
             let stateCopy = copyByJSON(this.state)
             stateCopy.todoInfo[stateCopy.currentFolderIndex].todos.unshift(todo)
+            stateCopy.todoList.push(todo)
             stateCopy.newTodo = ''
             this.setState(stateCopy)
         }, (error) => {
