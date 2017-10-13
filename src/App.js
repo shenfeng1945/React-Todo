@@ -26,41 +26,28 @@ class App extends Component {
             ],
             currentFolderIndex: 0
         }
-        //初始化
-        let user = getCurrentUser()
-        let error = (error) => {
-            console.log(error)
-        }
-        if (user) {
-            TodoModel.getFolder(user, (folders) => {
-                let stateCopy = JSON.parse(JSON.stringify(this.state))
-                folders.forEach((item, index) => {
-                    stateCopy.todoInfo[index] = item.attributes
-                    stateCopy.todoInfo[index].folderId = item.id
-                })
-                this.setState(stateCopy)
-                //folder加载完后,再加载todo
-                let folderId = this.state.todoInfo[this.state.currentFolderIndex]
-                TodoModel.getByUser(folderId, (todos) => {
-                    let stateCopy = JSON.parse(JSON.stringify(this.state))
-                    stateCopy.todoList = todos
-                    this.setState(stateCopy)
-                }, error)
-            })
-        }
+    }
+    componentWillMount() {
+        //刷性页面会加载
+        this.initFolderAndTodo()
     }
 
     render() {
+        console.log('todoList',this.state.todoList)
         let todosAll = this.state.todoList.filter((item) => !item.deleted).map((item, index) => {
             return <li key={index}>
                 <TodoItem todo={item} onDelete={this.delete.bind(this)} onChange={this.toggle.bind(this)}/>
             </li>
         })
         let todosActive = this.state.todoList.filter((item) => item.status === '' && !item.deleted).map((item, index) => {
-            return <li key={index}>heoo</li>
+            return <li key={index}>
+                <TodoItem todo={item} onDelete={this.delete.bind(this)} onChange={this.toggle.bind(this)}/>
+            </li>
         })
         let todosFinish = this.state.todoList.filter((item) => item.status === 'completed').map((item, index) => {
-            return <li key={index}>hi</li>
+            return <li key={index}>
+                <TodoItem todo={item} onDelete={this.delete.bind(this)} onChange={this.toggle.bind(this)}/>
+            </li>
         })
 
 
@@ -73,7 +60,8 @@ class App extends Component {
         // })
         let todoFolders = this.state.todoInfo.map((item, index) => {
             return (
-                <TodoFolder key={index} index={index} todoFolderInfo={item} onClickFolder={this.onClickLoadTodo.bind(this)}/>
+                <TodoFolder key={index} index={index} todoFolderInfo={item}
+                            onClickFolder={this.onClickLoadTodo.bind(this)}/>
             )
         })
         return (
@@ -112,17 +100,17 @@ class App extends Component {
                             <use xlinkHref="#icon-enter"></use>
                         </svg>
                     </div>
-                    <ol>{todosAll}</ol>
-                    <ol>{todosActive}</ol>
-                    <ol>{todosFinish}</ol>
+                    <ol className="todoItem active">{todosAll}</ol>
+                    <ol className="todoItem ">{todosActive}</ol>
+                    <ol className="todoItem">{todosFinish}</ol>
                     <div className="todoItemState">
-                        <a href="#">
+                        <a href="#" className="links active" onClick={this.conditionChange.bind(this)}>
                             Everything
                         </a>
-                        <a href="#">
+                        <a href="#" className="links" onClick={this.conditionChange.bind(this)}>
                             Processing
                         </a>
-                        <a href="#">
+                        <a href="#" className="links" onClick={this.conditionChange.bind(this)}>
                             Completed
                         </a>
                     </div>
@@ -139,9 +127,54 @@ class App extends Component {
             </div>
         )
     }
-    onClickLoadTodo(index){
-        console.log(this.state.todoInfo[index])
+
+    conditionChange(e){
+        let $a = $(e.currentTarget)
+        let index = $a.index()
+        $('a.links').eq(index).addClass('active').siblings('a.links').removeClass('active')
+        $('ol.todoItem').eq(index).addClass('active').siblings('ol.todoItem').removeClass('active')
+
     }
+
+    initFolderAndTodo() {
+        //初始化
+        let user = getCurrentUser()
+        let error = (error) => {
+            console.log(error)
+        }
+        if (user) {
+            TodoModel.getFolder(user, (folders) => {
+                let stateCopy = JSON.parse(JSON.stringify(this.state))
+                folders.forEach((item, index) => {
+                    stateCopy.todoInfo[index] = item.attributes
+                    stateCopy.todoInfo[index].folderId = item.id
+                })
+                this.setState(stateCopy)
+                //folder加载完后,再加载todo
+                let folderId = this.state.todoInfo[this.state.currentFolderIndex].folderId
+                TodoModel.getByUser(folderId, (todos) => {
+                    let stateCopy = JSON.parse(JSON.stringify(this.state))
+                    stateCopy.todoList = todos
+                    this.setState(stateCopy)
+                }, error)
+            })
+        }
+    }
+
+    onClickLoadTodo(index) {
+        let stateCopy = copyByJSON(this.state)
+        stateCopy.currentFolderIndex = index
+        this.setState(stateCopy)
+
+        let folderId = stateCopy.todoInfo[stateCopy.currentFolderIndex].folderId
+        TodoModel.getByUser(folderId, (todos) => {
+            let stateCopy = JSON.parse(JSON.stringify(this.state))
+            stateCopy.todoList = todos
+            this.setState(stateCopy)
+        })
+
+    }
+
     componentDidMount() {
     }
 
@@ -177,6 +210,7 @@ class App extends Component {
         let stateCopy = JSON.parse(JSON.stringify(this.state))
         stateCopy.user = {}
         stateCopy.todoList = []
+        stateCopy.todoInfo = []
         this.setState(stateCopy)
 
     }
@@ -184,12 +218,16 @@ class App extends Component {
     signInOrSignUp(user, type) {
         if (type === '注册') {
             TodoModel.init(user, (id) => {
-                this.state.todoInfo[0].userId = id
-                let stateCopy = copyByJSON(this.state)
-                stateCopy.user = user
-                this.setState(stateCopy)
+                // let stateCopy = copyByJSON(this.state)
+                // stateCopy.todoInfo[0].userId = id
+                // stateCopy.user = user
+                // this.setState(stateCopy)
+                this.initFolderAndTodo()
             }, (error) => {
             })
+        } else if (type === '登录') {
+            //登录成功会加载
+            this.initFolderAndTodo()
         }
         let stateCopy = copyByJSON(this.state)
         stateCopy.user = user
@@ -256,6 +294,7 @@ class App extends Component {
         todo.status = todo.status === 'completed' ? '' : 'completed'
         TodoModel.update(todo, () => {
             this.setState(this.state)
+            this.initFolderAndTodo()
         }, (error) => {
             todo.status = oldStatus
             this.setState(this.state)
