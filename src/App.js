@@ -3,7 +3,7 @@ import './App.css'
 import './reset.css'
 import UserDialog from './UserDialog'
 import 'normalize.css'
-import {getCurrentUser, signOut, TodoModel,GroupModel} from "./leancloud"
+import {getCurrentUser, signOut, TodoModel, GroupModel} from "./leancloud"
 import {copyByJSON} from './copyByJSON'
 import TodoInput from './TodoInput'
 import TodoItem from './TodoItem'
@@ -19,48 +19,49 @@ class App extends Component {
             user: getCurrentUser() || {},
             newTodo: '',
             todoList: [],
-            newFolder:'',
-            curFolder:'',
-            todoInfo:[
-                {folderName:'我的一天',userId:'',todos:[],folderId:''}
+            newFolder: '',
+            curFolder: '',
+            todoInfo: [
+                {folderName: '我的一天', userId: '', todos: [], folderId: ''}
             ],
-            currentFolderIndex:0
+            currentFolderIndex: 0
         }
         //初始化
         let user = getCurrentUser()
-        let error = (error)=>{console.log(error)}
+        let error = (error) => {
+            console.log(error)
+        }
         if (user) {
-
-            TodoModel.getFolder(user,(folders)=>{
+            TodoModel.getFolder(user, (folders) => {
                 let stateCopy = JSON.parse(JSON.stringify(this.state))
-                folders.forEach((item,index)=>{
-                   stateCopy.todoInfo[index]=item.attributes
-                    stateCopy.todoInfo[index].folderId=item.id
+                folders.forEach((item, index) => {
+                    stateCopy.todoInfo[index] = item.attributes
+                    stateCopy.todoInfo[index].folderId = item.id
                 })
                 this.setState(stateCopy)
                 //folder加载完后,再加载todo
                 let folderId = this.state.todoInfo[this.state.currentFolderIndex]
                 TodoModel.getByUser(folderId, (todos) => {
-                let stateCopy = JSON.parse(JSON.stringify(this.state))
-                stateCopy.todoList = todos
-                this.setState(stateCopy)
-            },error)
+                    let stateCopy = JSON.parse(JSON.stringify(this.state))
+                    stateCopy.todoList = todos
+                    this.setState(stateCopy)
+                }, error)
             })
         }
     }
+
     render() {
         let todosAll = this.state.todoList.filter((item) => !item.deleted).map((item, index) => {
             return <li key={index}>
                 <TodoItem todo={item} onDelete={this.delete.bind(this)} onChange={this.toggle.bind(this)}/>
             </li>
         })
-        let todosActive = this.state.todoList.filter((item)=>item.status===''&& !item.deleted).map((item,index)=>{
+        let todosActive = this.state.todoList.filter((item) => item.status === '' && !item.deleted).map((item, index) => {
             return <li key={index}>heoo</li>
         })
-        let todosFinish = this.state.todoList.filter((item)=>item.status==='completed').map((item,index)=>{
+        let todosFinish = this.state.todoList.filter((item) => item.status === 'completed').map((item, index) => {
             return <li key={index}>hi</li>
         })
-
 
 
         // let groups = this.state.groups.filter((item)=>item!=='我的一天').map((item,index)=>{
@@ -70,9 +71,9 @@ class App extends Component {
         //         </li>
         //     )
         // })
-        let todoFolders = this.state.todoInfo.map((item,index)=>{
+        let todoFolders = this.state.todoInfo.map((item, index) => {
             return (
-                <TodoFolder key={index} todoFolderInfo={item}/>
+                <TodoFolder key={index} index={index} todoFolderInfo={item} onClickFolder={this.onClickLoadTodo.bind(this)}/>
             )
         })
         return (
@@ -97,7 +98,9 @@ class App extends Component {
                         {todoFolders}
                     </div>
                     <div className="createFolderAction" onClick={this.createFolder.bind(this)}>
-                        <svg className="icon"><use xlinkHref="#icon-add"></use></svg>
+                        <svg className="icon">
+                            <use xlinkHref="#icon-add"></use>
+                        </svg>
                         <span>创建清单</span>
                     </div>
                 </nav>
@@ -105,7 +108,9 @@ class App extends Component {
                     <div className="inputWrapper">
                         <TodoInput content={this.state.newTodo} onSubmit={this.addTodo.bind(this)}
                                    onChange={this.changeTitle.bind(this)}/>
-                        <svg className="icon"><use xlinkHref="#icon-enter"></use></svg>
+                        <svg className="icon">
+                            <use xlinkHref="#icon-enter"></use>
+                        </svg>
                     </div>
                     <ol>{todosAll}</ol>
                     <ol>{todosActive}</ol>
@@ -127,28 +132,44 @@ class App extends Component {
                     <UserDialog onSignUp={this.signInOrSignUp.bind(this)} onSignIn={this.signInOrSignUp.bind(this)}/>
                 }
                 {/*<CreateDialog onSubmit={this.addFolder.bind(this)}*/}
-                              {/*onCanccescel={this.cancelAddFolder.bind(this)}*/}
-                              {/*newFolder={this.state.newFolder}*/}
-                              {/*onChange={this.changeFolderTitle.bind(this)}/>*/}
+                {/*onCanccescel={this.cancelAddFolder.bind(this)}*/}
+                {/*newFolder={this.state.newFolder}*/}
+                {/*onChange={this.changeFolderTitle.bind(this)}/>*/}
                 <ContentDialog onAddFolder={this.onAddFolder.bind(this)} userId={this.state.user.id}/>
             </div>
         )
     }
-    componentDidMount(){
+    onClickLoadTodo(index){
+        console.log(this.state.todoInfo[index])
     }
-    onAddFolder(folder){
+    componentDidMount() {
+    }
+
+    onAddFolder(folder) {
         let newFolder = {
-            userId:folder.userId,
-            folderName:folder.folderName,
-            todos:[]
+            userId: folder.userId,
+            folderName: folder.folderName,
+            todos: []
         }
         let stateCopy = copyByJSON(this.state)
         stateCopy.todoInfo.push(newFolder)
-        stateCopy.newFolder=''
+        stateCopy.newFolder = ''
         this.setState(stateCopy)
+
+        //若不加,点击folder时,并没有绑定id
+        TodoModel.getFolder(this.state.user, (folders) => {
+            let stateCopy = JSON.parse(JSON.stringify(this.state))
+            folders.forEach((item, index) => {
+                stateCopy.todoInfo[index] = item.attributes
+                stateCopy.todoInfo[index].folderId = item.id
+            })
+            this.setState(stateCopy)
+        })
+
     }
-    createFolder(){
-      $('.createFolder-Wrapper').addClass('active')
+
+    createFolder() {
+        $('.createFolder-Wrapper').addClass('active')
     }
 
     signOut() {
@@ -160,14 +181,15 @@ class App extends Component {
 
     }
 
-    signInOrSignUp(user,type) {
-        if(type==='注册'){
-            TodoModel.init(user,(id)=>{
+    signInOrSignUp(user, type) {
+        if (type === '注册') {
+            TodoModel.init(user, (id) => {
                 this.state.todoInfo[0].userId = id
                 let stateCopy = copyByJSON(this.state)
                 stateCopy.user = user
                 this.setState(stateCopy)
-            },(error)=>{})
+            }, (error) => {
+            })
         }
         let stateCopy = copyByJSON(this.state)
         stateCopy.user = user
@@ -187,7 +209,7 @@ class App extends Component {
             status: '',
             deleted: false
         }
-        TodoModel.create(this.state.todoInfo[this.state.currentFolderIndex].folderId,newTodo, (todo) => {
+        TodoModel.create(this.state.todoInfo[this.state.currentFolderIndex].folderId, newTodo, (todo) => {
             // newTodo.id = id
             // this.state.todoList.push(newTodo)
             // this.setState({
@@ -199,6 +221,7 @@ class App extends Component {
             stateCopy.todoList.push(todo)
             stateCopy.newTodo = ''
             this.setState(stateCopy)
+            console.log(this.state.todoInfo[0])
         }, (error) => {
             console.log(error)
         })
@@ -216,7 +239,16 @@ class App extends Component {
         TodoModel.destroy(todo.id, () => {
             todo.deleted = true
             this.setState(this.state)
+            //根据id删除todoInfo当前folder里的todos里的某一个
+            let stateCopy = copyByJSON(this.state)
+            this.state.todoInfo[0].todos.map((item, index) => {
+                if (item.id === todo.id) {
+                    stateCopy.todoInfo[0].todos.splice(index, 1)
+                }
+            })
+            this.setState(stateCopy)
         })
+
     }
 
     toggle(e, todo) {
