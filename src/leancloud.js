@@ -11,28 +11,25 @@ export default AV
 export const TodoModel = {
     //创建todo
     create(folderId,{status,title,deleted},successFn,errorFn){
-        console.log('folderId',folderId)
-        // let todoFolder = AV.Object.createWithoutData('TodoFolder',folderId)
         let Todo = AV.Object.extend('Todo')
         let todo = new Todo()
         todo.set('title',title)
         todo.set('status',status)
         todo.set('deleted',deleted)
-        // todo.set('folderId',folderId)
+        todo.set('folderId',folderId)
         let acl = new AV.ACL()
         acl.setPublicReadAccess(false) // 注意这里是 false
         acl.setWriteAccess(AV.User.current(), true)
         acl.setReadAccess(AV.User.current(), true)
         todo.setACL(acl);
         todo.save().then((response)=>{
-            console.log(response)
             successFn.call(null,{
                 id:response.id,
                 title:response.attributes.title,
-                folderObj:response.attributes.folderObj,
                 status:response.attributes.status,
                 deleted:response.attributes.deleted,
-
+                createTime:response.createdAt,
+                updateTime:response.updatedAt,
             })
         },(error)=>{
             errorFn && errorFn.call(null,error)
@@ -42,8 +39,8 @@ export const TodoModel = {
         let todoQuery = new AV.Query('Todo')
         todoQuery.equalTo('deleted',false)
         todoQuery.find().then((response)=>{
-            let array = response.map((t)=>{
-                return {id:t.id,...t.attributes}
+            let array = response.filter((item)=>item.attributes.folderId===folderId).map((t)=>{
+                return {id:t.id,...t.attributes,updateTime:t.updatedAt,createTime:t.createdAt}
             })
             successFn.call(null,array)
         },(error)=>{
@@ -64,7 +61,6 @@ export const TodoModel = {
         })
     },
     update({id,title,status,deleted},successFn,errorFn){
-        console.log('id',id)
         let todo = AV.Object.createWithoutData('Todo', id)
         title !==undefined && todo.set('title',title)
         status !==undefined && todo.set('status',status)
@@ -74,8 +70,6 @@ export const TodoModel = {
         },(error)=>{
             errorFn && errorFn.call(null,error)
         })
-    },
-    updateFolder({id,folderName},successFn,errorFn){
     },
     destroy(todoId,successFn,errorFn){
         TodoModel.update({id:todoId,deleted:true},successFn,errorFn)
