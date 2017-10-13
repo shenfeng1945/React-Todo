@@ -9,33 +9,58 @@ AV.init({
 });
 export default AV
 export const TodoModel = {
-    create({status,title,deleted},successFn,errorFn){
+    //创建todo
+    create(folderId,{status,title,deleted},successFn,errorFn){
+        console.log('folderId',folderId)
+        // let todoFolder = AV.Object.createWithoutData('TodoFolder',folderId)
         let Todo = AV.Object.extend('Todo')
         let todo = new Todo()
         todo.set('title',title)
         todo.set('status',status)
         todo.set('deleted',deleted)
+        // todo.set('folderId',folderId)
         let acl = new AV.ACL()
         acl.setPublicReadAccess(false) // 注意这里是 false
         acl.setWriteAccess(AV.User.current(), true)
         acl.setReadAccess(AV.User.current(), true)
         todo.setACL(acl);
         todo.save().then((response)=>{
-            successFn.call(null,response.id)
+            console.log(response)
+            successFn.call(null,{
+                id:response.id,
+                title:response.attributes.title,
+                folderObj:response.attributes.folderObj,
+                status:response.attributes.status,
+                deleted:response.attributes.deleted,
+
+            })
         },(error)=>{
             errorFn && errorFn.call(null,error)
         })
     },
-    getByUser(user,successFn,errorFn){
-        let query = new AV.Query('Todo')
-        query.equalTo('deleted',false)
-        query.find().then((response)=>{
+    getByUser(folderId,successFn,errorFn){
+        let todoQuery = new AV.Query('Todo')
+        todoQuery.equalTo('deleted',false)
+        todoQuery.find().then((response)=>{
             let array = response.map((t)=>{
                 return {id:t.id,...t.attributes}
             })
             successFn.call(null,array)
         },(error)=>{
             errorFn && errorFn.call(null,error)
+        })
+    },
+    getFolder(user,successFn){
+        let folderQuery = new AV.Query('TodoFolder')
+        folderQuery.find().then((folders)=>{
+            let todoFolders = []
+            folders.forEach((item)=>{
+                let folderUserId = item.attributes.userId
+                if(folderUserId === user.id){
+                    todoFolders.push(item)
+                }
+            })
+            successFn.call(null,todoFolders)
         })
     },
     update({id,title,status,deleted},successFn,errorFn){
@@ -50,8 +75,43 @@ export const TodoModel = {
             errorFn && errorFn.call(null,error)
         })
     },
+    updateFolder({id,folderName},successFn,errorFn){
+    },
     destroy(todoId,successFn,errorFn){
         TodoModel.update({id:todoId,deleted:true},successFn,errorFn)
+    },
+    createFolder(userId,title,successFn){
+        let TodoFolder = AV.Object.extend('TodoFolder')
+        let todoFolder = new TodoFolder()
+        todoFolder.set('folderName',title)
+        todoFolder.set('userId',userId)
+        todoFolder.set('todos',[])
+        let acl = new AV.ACL();
+        acl.setPublicReadAccess(false);
+        acl.setWriteAccess(AV.User.current(), true);
+        acl.setReadAccess(AV.User.current(), true);
+        todoFolder.setACL(acl);
+        todoFolder.save().then(function(response){
+            successFn && successFn.call(null,response.id)
+        },function(error){
+            console.log(error)
+        })
+    },
+    init(user,successFn,errorFn){
+        let folderName = '我的一天'
+        let TodoFolder = AV.Object.extend('TodoFolder')
+        let todoFolder = new TodoFolder()
+        todoFolder.set('folderName',folderName)
+        todoFolder.set('userId',user.id)
+        todoFolder.set('todos',[])
+        let acl = new AV.ACL();
+        acl.setPublicReadAccess(false);
+        acl.setWriteAccess(AV.User.current(), true);
+        acl.setReadAccess(AV.User.current(), true);
+        todoFolder.setACL(acl);
+        todoFolder.save().then((response)=>{
+            successFn && successFn.call(null,response.id)
+        })
     }
 
 }
@@ -103,6 +163,7 @@ export function getCurrentUser(){
 function getUserFromAVUser(AVUser){
     return {
         id:AVUser.id,
+        // ES6语法，表示导出AVUser.attributes
         ...AVUser.attributes
     }
 }
