@@ -8,8 +8,8 @@ import {copyByJSON} from './copyByJSON'
 import TodoInput from './TodoInput'
 import TodoItem from './TodoItem'
 import ContentDialog from './ContentDialog'
-import GroupItem from './GroupItem'
 import TodoFolder from './TodoFolder'
+import Weather from './Weather'
 import $ from 'jquery';
 
 class App extends Component {
@@ -24,16 +24,23 @@ class App extends Component {
             todoInfo: [
                 {folderName: '我的一天', userId: '', todos: [], folderId: ''}
             ],
-            currentFolderIndex: 0
+            currentFolderIndex: 0,
+            currentFolderName:'我的一天',
+            weather:{
+                currTime:'',
+                week:'',
+                currWeather:'',
+                city:''
+            }
         }
     }
     componentWillMount() {
         //刷性页面会加载
         this.initFolderAndTodo()
+        this.getWeather()
     }
 
     render() {
-        console.log('todoList',this.state.todoList)
         let todosAll = this.state.todoList.filter((item) => !item.deleted).map((item, index) => {
             return <li key={index}>
                 <TodoItem todo={item} onDelete={this.delete.bind(this)} onChange={this.toggle.bind(this)}/>
@@ -67,12 +74,7 @@ class App extends Component {
         return (
             <div className="App">
                 <nav className="aside">
-                    <ul className="weather">
-                        <li>时间：</li>
-                        <li>星期：</li>
-                        <li>天气：</li>
-                        <li>城市：</li>
-                    </ul>
+                    <Weather weather={this.state.weather}/>
                     <div className="user">
                         <svg className="icon">
                             <use xlinkHref="#icon-user"></use>
@@ -93,6 +95,7 @@ class App extends Component {
                     </div>
                 </nav>
                 <section className="content">
+                    <div>{this.state.currentFolderName}——代办事项</div>
                     <div className="inputWrapper">
                         <TodoInput content={this.state.newTodo} onSubmit={this.addTodo.bind(this)}
                                    onChange={this.changeTitle.bind(this)}/>
@@ -123,11 +126,40 @@ class App extends Component {
                 {/*onCanccescel={this.cancelAddFolder.bind(this)}*/}
                 {/*newFolder={this.state.newFolder}*/}
                 {/*onChange={this.changeFolderTitle.bind(this)}/>*/}
-                <ContentDialog onAddFolder={this.onAddFolder.bind(this)} userId={this.state.user.id}/>
+                <ContentDialog onAddFolder={this.onAddFolder.bind(this)} userId={this.state.user.id}
+                               onEditorFolder={this.enterEditorFolder.bind(this)}
+                               todoInfoFolderName={this.state.currentFolderName}
+                               editorFolderName={this.editorFolderName.bind(this)}
+                               deleteFolder={this.deleteFolder.bind(this)}/>
             </div>
         )
     }
-
+    deleteFolder(e){
+        let folderId = this.state.todoInfo[this.state.currentFolderIndex].folderId
+        let success = ()=>{
+            let stateCopy = copyByJSON(this.state)
+            stateCopy.todoInfo.splice(stateCopy.currentFolderIndex,1)
+            stateCopy.todoList = []
+            this.setState(stateCopy)
+            this.initFolderAndTodo()
+        }
+        TodoModel.destroyFolder(folderId,success)
+    }
+    //更改清单内容
+    editorFolderName(e){
+        let stateCopy = copyByJSON(this.state)
+        stateCopy.currentFolderName = e.target.value
+        this.setState(stateCopy)
+    }
+    //确定更改
+    enterEditorFolder(e){
+        let folderName = this.state.currentFolderName
+        let folderId = this.state.todoInfo[this.state.currentFolderIndex].folderId
+        let success = ()=>{
+            this.initFolderAndTodo()
+        }
+        TodoModel.editorFolderName(folderId,folderName,success)
+    }
     conditionChange(e){
         let $a = $(e.currentTarget)
         let index = $a.index()
@@ -164,6 +196,7 @@ class App extends Component {
     onClickLoadTodo(index) {
         let stateCopy = copyByJSON(this.state)
         stateCopy.currentFolderIndex = index
+        stateCopy.currentFolderName = stateCopy.todoInfo[index].folderName
         this.setState(stateCopy)
 
         let folderId = stateCopy.todoInfo[stateCopy.currentFolderIndex].folderId
@@ -204,15 +237,14 @@ class App extends Component {
     createFolder() {
         $('.createFolder-Wrapper').addClass('active')
     }
-
     signOut() {
         signOut()
         let stateCopy = JSON.parse(JSON.stringify(this.state))
         stateCopy.user = {}
         stateCopy.todoList = []
         stateCopy.todoInfo = []
+        stateCopy.currentFolderName='我的一天'
         this.setState(stateCopy)
-
     }
 
     signInOrSignUp(user, type) {
@@ -299,6 +331,52 @@ class App extends Component {
             todo.status = oldStatus
             this.setState(this.state)
         })
+    }
+    getCurrentTime(){
+        return new Date().toLocaleString()
+    }
+    getWeek(){
+        let week = new Date().getDay()
+        console.log(typeof week)
+        switch(week){
+            case 0:return '星期日'
+            case 1:return '星期一'
+            case 2:return '星期二'
+            case 3:return '星期三'
+            case 4:return '星期四'
+            case 5:return '星期五'
+            case 6:return '星期六'
+        }
+    }
+    getWeatherSuccess(data){
+       console.log(data)
+        if(data.status === 'OK'){
+            let stateCopy = copyByJSON(this.state)
+            stateCopy.weather.currTime = this.getCurrentTime()
+            stateCopy.weather.city = data.weather[0]['city_name']
+            stateCopy.weather.currWeather = data.weather[0].now.text
+            stateCopy.weather.week = this.getWeek()
+            this.setState(stateCopy)
+            setInterval(()=>{
+              let stateCopy = copyByJSON(this.state)
+              stateCopy.weather.currTime = this.getCurrentTime()
+              this.setState(stateCopy)
+            },1000)
+        }
+    }
+    getWeather(){
+        var request = new XMLHttpRequest()
+        request.onreadystatechange = ()=>{
+            if(request.readyState===4){
+                if(request.status>=200 && request.status<400){
+                    this.getWeatherSuccess(JSON.parse(request.responseText))
+                }else{
+                    console.log('get weather fail')
+                }
+            }
+        }
+        request.open('get','https://weixin.jirengu.com/weather')
+        request.send()
     }
 }
 
