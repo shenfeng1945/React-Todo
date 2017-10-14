@@ -1,18 +1,16 @@
-import React,{Component} from 'react'
+import React, {Component} from 'react'
+import './ForgotPassword.css'
+
 export default class ForgotPassword extends Component {
-    render(){
+    render() {
         return (
             <div className="forgotPassword">
-                <h3>重置密码</h3>
+                <h3>找回密码</h3>
                 <form className="forgot" onSubmit={this.props.onSubmit}>
-                    <div className="row">
-                        <input type="text" placeholder="邮箱" value={this.props.formData.email}
-                          onChange={this.props.onChange.bind(null,'email')}/>
-                    </div>
-                    <div className="actions">
-                        <button type="submit">发送重置邮件</button>
-                        <a href="#" onClick={this.props.onSignIn}>返回</a>
-                    </div>
+                    <input type="text" placeholder="邮箱" value={this.props.formData.email}
+                           onChange={this.props.onChange.bind(null, 'email')}/>
+                    <button type="submit">重置密码</button>
+                    <a href="#" onClick={this.props.onSignIn}>返回登录</a>
                 </form>
 
             </div>
