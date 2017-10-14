@@ -74,6 +74,19 @@ export const TodoModel = {
     destroy(todoId,successFn,errorFn){
         TodoModel.update({id:todoId,deleted:true},successFn,errorFn)
     },
+    destroyFolder(folderId,successFn){
+        let todoQuery = new AV.Query('Todo')
+        let todoFolder = AV.Object.createWithoutData('TodoFolder', folderId)
+        todoQuery.equalTo('folderId',folderId)
+        todoQuery.find().then((response)=>{
+            response.map((item)=>{
+                this.destroy(item.id,successFn)
+            })
+        })
+        todoFolder.destroy().then(()=>{
+            successFn()
+        })
+    },
     createFolder(userId,title,successFn){
         let TodoFolder = AV.Object.extend('TodoFolder')
         let todoFolder = new TodoFolder()
@@ -105,6 +118,15 @@ export const TodoModel = {
         todoFolder.setACL(acl);
         todoFolder.save().then((response)=>{
             successFn && successFn.call(null,response.id)
+        })
+    },
+    editorFolderName(folderId,folderName,successFn){
+        let todoFolder = AV.Object.createWithoutData('TodoFolder', folderId)
+        todoFolder.set('folderName',folderName)
+        todoFolder.save().then(()=>{
+            successFn()
+        },(error)=>{
+            console.log('更改失败')
         })
     }
 
