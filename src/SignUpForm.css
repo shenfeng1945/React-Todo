@@ -2,3 +2,24 @@
     display: flex;
     flex-direction:column;
 }
+.signUpForm > input{
+    width:75%;
+    margin:.3em auto;
+    border:1px solid #f99;
+    border-radius:2px;
+    box-shadow: 0 0 2px #f99;
+    padding:8px 0 8px 5px;
+}
+.signUpForm > button{
+    width:75%;
+    margin:5px auto;
+    background:#db4c3f;
+    border:none;
+    color:#eee;
+    cursor: pointer;
+    padding:.5em 0;
+    border-radius:3px;
+}
+.signUpForm > button:hover{
+   opacity:.7;
+}

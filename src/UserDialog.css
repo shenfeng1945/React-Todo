@@ -6,13 +6,23 @@
     bottom:0;
     display:flex;
     justify-content:center;
-    align-items:center;
-    background:hsla(0,0%,0%,0.40);
+    background:white;
+    align-items: flex-start;
+    /*background:transparent url(https://i.loli.net/2017/10/14/59e1a4e15ba1a.jpg) no-repeat center;*/
+    /*background-size:cover;*/
 }
 .UserDialog{
+    margin-top:100px;
     border-radius:4px;
     min-width:20em;
     background:white;
     border:1px solid #aaa;
     box-shadow:0 0 1em hsla(0,0%,0%,0.35);
+    padding-top:30px;
+    padding-bottom:10px;
+}
+.UserDialog >.logo{
+   font-size:2em;
+    text-align: center;
+    margin:.67em 0;
 }
