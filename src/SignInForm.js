@@ -10,7 +10,7 @@ export default class SignInForm extends Component {
                         <input type="password" placeholder="密码" value={this.props.formData.password}
                                onChange={this.props.onChange.bind(null,'password')}/>
                     <button type="submit">登录</button>
-                    <a href="#" className='forgotPassword' onClick={this.props.onForgotPassword}>忘记密码</a>
+                    <a href="#" onClick={this.props.onForgotPassword}>忘记密码?</a>
                 </form>
         )
     }
