@@ -50,6 +50,27 @@ export default class UserDialog extends Component {
         e.preventDefault()
         let type='注册'
         let {email, username, password} = this.state.formData
+        //username验证
+        if(username.length<3 && username.length>0){
+            alert('用户名过短，请更换用户名')
+            return
+        }else if(username.length===0){
+            alert('用户名不能为空')
+            return
+        }
+        //password验证
+        if(password.length<6){
+            alert('密码过短，请更换密码')
+            return
+        }else if(password.length===0){
+            alert('密码不能为空')
+            return
+        }
+        //email验证
+        if(email.search(/(.+)@(.+)\.(.+)/) < 0){
+            alert('邮箱格式错误，请重新输入')
+            return
+        }
         let success = (user) => {
             this.props.onSignUp.call(null, user,type)
         }
@@ -69,10 +90,19 @@ export default class UserDialog extends Component {
         e.preventDefault()
         let type='登录'
         let {username, password} = this.state.formData
+        if(username.length===0){
+            alert('用户名不能为空')
+            return
+        }
+        if(password.length===0){
+            alert('密码不能为空')
+            return
+        }
         let success = (user) => {
             this.props.onSignIn.call(null, user,type)
         }
         let error = (error) => {
+            console.log(error)
             switch (error.code) {
                 case 210:
                     alert('用户名和密码不匹配')
