@@ -7,20 +7,20 @@ export default class SignInOrSignUpForm extends Component {
     constructor(props) {
         super(props)
         this.state = {
-            selected: 'signUp',
+            selected: 'signIn',
         }
     }
     render() {
         return (
             <div className="signInOrSignUp">
                 <nav>
-                    <label>
-                        <input type="radio" value="signUp" checked={this.state.selected === 'signUp'}
-                               onChange={this.switch.bind(this)}/>注册
-                    </label>
-                    <label>
+                    <label className={this.state.selected==='signIn'?'active':''}>
                         <input type="radio" value="signIn" checked={this.state.selected === 'signIn'}
                                onChange={this.switch.bind(this)}/>登录
+                    </label>
+                    <label className={this.state.selected==='signUp'?'active':''}>
+                        <input type="radio" value="signUp" checked={this.state.selected === 'signUp'}
+                               onChange={this.switch.bind(this)}/>注册
                     </label>
                 </nav>
                 <div className="panes">
