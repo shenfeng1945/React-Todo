@@ -8,7 +8,7 @@ export default class TodoFolder extends Component {
 
         this.folderIcon = (() => {
             switch (this.props.todoFolderInfo.folderName) {
-                case '我的一天': return '#icon-home';
+                case '我的一天': return '#icon-home-copy';
                 default: return '#icon-all01';
             }
         })();
@@ -16,7 +16,7 @@ export default class TodoFolder extends Component {
         this.folderModifyIcon = (() => {
             switch (this.props.todoFolderInfo.folderName) {
                 case '我的一天': return 'icon noModify'
-                default: return 'icon noModify todo-icon-modify';
+                default: return 'icon noModify todo-icon-modify icon-left';
             }
         })();
         this.currentFolder = (()=>{
@@ -31,7 +31,7 @@ export default class TodoFolder extends Component {
     render() {
         return (
             <div className={this.currentFolder} onClick={this.onClick.bind(this)}>
-                <svg className="icon"><use xlinkHref={this.folderIcon}></use></svg>
+                <svg className="icon icon-left"><use xlinkHref={this.folderIcon}></use></svg>
                 <span className="todoFolderName">{this.props.todoFolderInfo.folderName}</span>
                 {/*<span className="todoSum">{this.props.todoFolderInfo.todos.length}</span>*/}
                 <svg className={this.folderModifyIcon} onClick={this.onEditorFolder.bind(this)}><use xlinkHref="#icon-editor"></use></svg>
