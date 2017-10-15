@@ -51,6 +51,11 @@ export default class ContentDialog extends Component {
     addFolder(e) {
         let userId = this.props.userId
         let title = this.state.newFolder
+        if(this.props.todoInfoLength===10){
+            alert('分组个数过多,拒绝执行！')
+            this.cancelAddFolder()
+            return
+        }
         TodoModel.createFolder(userId, title, (id) => {
             let folder = {
                 usrId: id,
