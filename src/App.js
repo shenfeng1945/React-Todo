@@ -152,6 +152,8 @@ class App extends Component {
             stateCopy.todoList = []
             this.setState(stateCopy)
             this.initFolderAndTodo()
+            //当我删除某一个todoFolder后,自动点击第一个跳到最前面
+             $('.todoFolderItem').eq(0).click()
         }
         TodoModel.destroyFolder(folderId, success)
     }
