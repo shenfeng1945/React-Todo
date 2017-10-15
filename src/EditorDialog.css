@@ -44,7 +44,7 @@
 }
 .editorFolder-Wrapper>.editorFolder>.editorActions>.icon{
    position:absolute;
-    left:10px;
+    left:20px;
     bottom:20px;
     fill:#999;
     cursor:pointer;
