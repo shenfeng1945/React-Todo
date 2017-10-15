@@ -139,7 +139,8 @@ class App extends Component {
                                onEditorFolder={this.enterEditorFolder.bind(this)}
                                todoInfoFolderName={this.state.currentFolderName}
                                editorFolderName={this.editorFolderName.bind(this)}
-                               deleteFolder={this.deleteFolder.bind(this)}/>
+                               deleteFolder={this.deleteFolder.bind(this)}
+                               todoInfoLength={this.state.todoInfo.length}/>
             </div>
         )
     }
