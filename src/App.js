@@ -57,15 +57,6 @@ class App extends Component {
                 <TodoItem todo={item} onDelete={this.delete.bind(this)} onChange={this.toggle.bind(this)}/>
             </li>
         })
-
-
-        // let groups = this.state.groups.filter((item)=>item!=='我的一天').map((item,index)=>{
-        //     return (
-        //         <li key={index}>
-        //             <GroupItem title={item} selected={this.state.curFolder}/>
-        //         </li>
-        //     )
-        // })
         let todoFolders = this.state.todoInfo.map((item, index) => {
             return (
                 <TodoFolder key={index} index={index} todoFolderInfo={item}
@@ -120,7 +111,7 @@ class App extends Component {
                             Everything 所有
                         </a>
                         <a href="#" className="state" onClick={this.conditionChange.bind(this)}>
-                            Processing 正进行
+                            Processing 待完成
                         </a>
                         <a href="#" className="state" onClick={this.conditionChange.bind(this)}>
                             Completed 已完成
@@ -131,10 +122,6 @@ class App extends Component {
                 {this.state.user.id ? null :
                     <UserDialog onSignUp={this.signInOrSignUp.bind(this)} onSignIn={this.signInOrSignUp.bind(this)}/>
                 }
-                {/*<CreateDialog onSubmit={this.addFolder.bind(this)}*/}
-                {/*onCanccescel={this.cancelAddFolder.bind(this)}*/}
-                {/*newFolder={this.state.newFolder}*/}
-                {/*onChange={this.changeFolderTitle.bind(this)}/>*/}
                 <ContentDialog onAddFolder={this.onAddFolder.bind(this)} userId={this.state.user.id}
                                onEditorFolder={this.enterEditorFolder.bind(this)}
                                todoInfoFolderName={this.state.currentFolderName}
@@ -297,18 +284,11 @@ class App extends Component {
             deleted: false
         }
         TodoModel.create(this.state.todoInfo[this.state.currentFolderIndex].folderId, newTodo, (todo) => {
-            // newTodo.id = id
-            // this.state.todoList.push(newTodo)
-            // this.setState({
-            //     newTodo: '',
-            //     todoList: this.state.todoList
-            // })
             let stateCopy = copyByJSON(this.state)
             stateCopy.todoInfo[stateCopy.currentFolderIndex].todos.unshift(todo)
             stateCopy.todoList.push(todo)
             stateCopy.newTodo = ''
             this.setState(stateCopy)
-            console.log(this.state.todoInfo[0])
         }, (error) => {
             console.log(error)
         })
@@ -356,7 +336,6 @@ class App extends Component {
 
     getWeek() {
         let week = new Date().getDay()
-        console.log(typeof week)
         switch (week) {
             case 0:
                 return '星期日'
@@ -376,12 +355,22 @@ class App extends Component {
     }
 
     getWeatherSuccess(data) {
-        console.log(data)
         if (data.status === 'OK') {
             let stateCopy = copyByJSON(this.state)
             stateCopy.weather.currTime = this.getCurrentTime()
             stateCopy.weather.city = data.weather[0]['city_name']
             stateCopy.weather.currWeather = data.weather[0].now.text
+            stateCopy.weather.week = this.getWeek()
+            this.setState(stateCopy)
+            setInterval(() => {
+                let stateCopy = copyByJSON(this.state)
+                stateCopy.weather.currTime = this.getCurrentTime()
+                this.setState(stateCopy)
+            }, 1000)
+        }else{
+            alert('获取城市,天气失败')
+            let stateCopy = copyByJSON(this.state)
+            stateCopy.weather.currTime = this.getCurrentTime()
             stateCopy.weather.week = this.getWeek()
             this.setState(stateCopy)
             setInterval(() => {
