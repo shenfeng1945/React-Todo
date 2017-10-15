@@ -59,7 +59,7 @@ export default class UserDialog extends Component {
             return
         }
         //password验证
-        if(password.length<6){
+        if(password.length<6 && password.length>0){
             alert('密码过短，请更换密码')
             return
         }else if(password.length===0){
