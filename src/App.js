@@ -25,15 +25,16 @@ class App extends Component {
                 {folderName: '我的一天', userId: '', todos: [], folderId: ''}
             ],
             currentFolderIndex: 0,
-            currentFolderName:'我的一天',
-            weather:{
-                currTime:'',
-                week:'',
-                currWeather:'',
-                city:''
+            currentFolderName: '我的一天',
+            weather: {
+                currTime: '',
+                week: '',
+                currWeather: '',
+                city: ''
             }
         }
     }
+
     componentWillMount() {
         //刷性页面会加载
         this.initFolderAndTodo()
@@ -76,45 +77,53 @@ class App extends Component {
                 <nav className="aside">
                     <Weather weather={this.state.weather}/>
                     <div className="user">
-                        <svg className="icon">
-                            <use xlinkHref="#icon-user"></use>
-                        </svg>
-                        {this.state.user.username}
-                        <svg className="icon" onClick={this.signOut.bind(this)}>
-                            <use xlinkHref="#icon-off"></use>
-                        </svg>
+                        <span className="user-head">
+                            <svg className="icon icon-left">
+                                <use xlinkHref="#icon-user"></use>
+                            </svg>
+                        </span>
+                        <span className="username">
+                            {this.state.user.username}
+                        </span>
+                        <span className="logout" title='登出'>
+                            <svg className="icon icon-left" onClick={this.signOut.bind(this)}>
+                                <use xlinkHref="#icon-off"></use>
+                            </svg>
+                        </span>
                     </div>
                     <div className="todoFolderItemWrap">
                         {todoFolders}
                     </div>
                     <div className="createFolderAction" onClick={this.createFolder.bind(this)}>
-                        <svg className="icon">
+                        <svg className="icon icon-left icon-small">
                             <use xlinkHref="#icon-add"></use>
                         </svg>
-                        <span>创建清单</span>
+                        <span>新建分组</span>
                     </div>
                 </nav>
                 <section className="content">
-                    <div>{this.state.currentFolderName}——代办事项</div>
+                    <div className="todo-head">{this.state.currentFolderName}——代办事项</div>
                     <div className="inputWrapper">
                         <TodoInput content={this.state.newTodo} onSubmit={this.addTodo.bind(this)}
                                    onChange={this.changeTitle.bind(this)}/>
-                        <svg className="icon">
+                        <svg className="icon icon-left">
                             <use xlinkHref="#icon-enter"></use>
                         </svg>
                     </div>
-                    <ol className="todoItem active">{todosAll}</ol>
-                    <ol className="todoItem ">{todosActive}</ol>
-                    <ol className="todoItem">{todosFinish}</ol>
+                    <div className="todoItem-Info">
+                        <ol className="todoItems active">{todosAll}</ol>
+                        <ol className="todoItems ">{todosActive}</ol>
+                        <ol className="todoItems">{todosFinish}</ol>
+                    </div>
                     <div className="todoItemState">
-                        <a href="#" className="links active" onClick={this.conditionChange.bind(this)}>
-                            Everything
+                        <a href="#" className="state active" onClick={this.conditionChange.bind(this)}>
+                            Everything 所有
                         </a>
-                        <a href="#" className="links" onClick={this.conditionChange.bind(this)}>
-                            Processing
+                        <a href="#" className="state" onClick={this.conditionChange.bind(this)}>
+                            Processing 正进行
                         </a>
-                        <a href="#" className="links" onClick={this.conditionChange.bind(this)}>
-                            Completed
+                        <a href="#" className="state" onClick={this.conditionChange.bind(this)}>
+                            Completed 已完成
                         </a>
                     </div>
                 </section>
@@ -134,37 +143,41 @@ class App extends Component {
             </div>
         )
     }
-    deleteFolder(e){
+
+    deleteFolder(e) {
         let folderId = this.state.todoInfo[this.state.currentFolderIndex].folderId
-        let success = ()=>{
+        let success = () => {
             let stateCopy = copyByJSON(this.state)
-            stateCopy.todoInfo.splice(stateCopy.currentFolderIndex,1)
+            stateCopy.todoInfo.splice(stateCopy.currentFolderIndex, 1)
             stateCopy.todoList = []
             this.setState(stateCopy)
             this.initFolderAndTodo()
         }
-        TodoModel.destroyFolder(folderId,success)
+        TodoModel.destroyFolder(folderId, success)
     }
+
     //更改清单内容
-    editorFolderName(e){
+    editorFolderName(e) {
         let stateCopy = copyByJSON(this.state)
         stateCopy.currentFolderName = e.target.value
         this.setState(stateCopy)
     }
+
     //确定更改
-    enterEditorFolder(e){
+    enterEditorFolder(e) {
         let folderName = this.state.currentFolderName
         let folderId = this.state.todoInfo[this.state.currentFolderIndex].folderId
-        let success = ()=>{
+        let success = () => {
             this.initFolderAndTodo()
         }
-        TodoModel.editorFolderName(folderId,folderName,success)
+        TodoModel.editorFolderName(folderId, folderName, success)
     }
-    conditionChange(e){
+
+    conditionChange(e) {
         let $a = $(e.currentTarget)
         let index = $a.index()
-        $('a.links').eq(index).addClass('active').siblings('a.links').removeClass('active')
-        $('ol.todoItem').eq(index).addClass('active').siblings('ol.todoItem').removeClass('active')
+        $('a.state').eq(index).addClass('active').siblings('a.state').removeClass('active')
+        $('ol.todoItems').eq(index).addClass('active').siblings('ol.todoItems').removeClass('active')
 
     }
 
@@ -237,13 +250,14 @@ class App extends Component {
     createFolder() {
         $('.createFolder-Wrapper').addClass('active')
     }
+
     signOut() {
         signOut()
         let stateCopy = JSON.parse(JSON.stringify(this.state))
         stateCopy.user = {}
         stateCopy.todoList = []
         stateCopy.todoInfo = []
-        stateCopy.currentFolderName='我的一天'
+        stateCopy.currentFolderName = '我的一天'
         this.setState(stateCopy)
     }
 
@@ -332,50 +346,61 @@ class App extends Component {
             this.setState(this.state)
         })
     }
-    getCurrentTime(){
+
+    getCurrentTime() {
         return new Date().toLocaleString()
     }
-    getWeek(){
+
+    getWeek() {
         let week = new Date().getDay()
         console.log(typeof week)
-        switch(week){
-            case 0:return '星期日'
-            case 1:return '星期一'
-            case 2:return '星期二'
-            case 3:return '星期三'
-            case 4:return '星期四'
-            case 5:return '星期五'
-            case 6:return '星期六'
+        switch (week) {
+            case 0:
+                return '星期日'
+            case 1:
+                return '星期一'
+            case 2:
+                return '星期二'
+            case 3:
+                return '星期三'
+            case 4:
+                return '星期四'
+            case 5:
+                return '星期五'
+            case 6:
+                return '星期六'
         }
     }
-    getWeatherSuccess(data){
-       console.log(data)
-        if(data.status === 'OK'){
+
+    getWeatherSuccess(data) {
+        console.log(data)
+        if (data.status === 'OK') {
             let stateCopy = copyByJSON(this.state)
             stateCopy.weather.currTime = this.getCurrentTime()
             stateCopy.weather.city = data.weather[0]['city_name']
             stateCopy.weather.currWeather = data.weather[0].now.text
             stateCopy.weather.week = this.getWeek()
             this.setState(stateCopy)
-            setInterval(()=>{
-              let stateCopy = copyByJSON(this.state)
-              stateCopy.weather.currTime = this.getCurrentTime()
-              this.setState(stateCopy)
-            },1000)
+            setInterval(() => {
+                let stateCopy = copyByJSON(this.state)
+                stateCopy.weather.currTime = this.getCurrentTime()
+                this.setState(stateCopy)
+            }, 1000)
         }
     }
-    getWeather(){
+
+    getWeather() {
         var request = new XMLHttpRequest()
-        request.onreadystatechange = ()=>{
-            if(request.readyState===4){
-                if(request.status>=200 && request.status<400){
+        request.onreadystatechange = () => {
+            if (request.readyState === 4) {
+                if (request.status >= 200 && request.status < 400) {
                     this.getWeatherSuccess(JSON.parse(request.responseText))
-                }else{
+                } else {
                     console.log('get weather fail')
                 }
             }
         }
-        request.open('get','https://weixin.jirengu.com/weather')
+        request.open('get', 'https://weixin.jirengu.com/weather')
         request.send()
     }
 }
