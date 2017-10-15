@@ -13,10 +13,16 @@
     cursor:pointer;
 }
 .todoItem>.title{
-    /*flex:1;*/
     padding-left:.7em;
     word-break: break-all;
     width:76%;
+}
+.todoItem>#completed{
+    text-decoration:line-through;
+    color:#999;
+}
+.todoItem>#completed+.time{
+    color:#444;
 }
 .todoItem>.time{
     flex:1;
