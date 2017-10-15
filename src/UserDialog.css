@@ -8,6 +8,7 @@
     justify-content:center;
     background:white;
     align-items: flex-start;
+    z-index:3;
     /*background:transparent url(https://i.loli.net/2017/10/14/59e1a4e15ba1a.jpg) no-repeat center;*/
     /*background-size:cover;*/
 }

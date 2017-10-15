@@ -1,3 +1,32 @@
+svg.icon.icon-left{
+    margin:0 10px;
+}
 .todoFolderItem{
-    border:1px solid;
+    display: flex;
+    align-items:center;
+    padding:10px 0;
+    cursor: pointer;
+}
+.todoFolderItem.active{
+    background:rgba(190, 209, 232,.6);
+
+}
+.todoFolderItem svg.noModify{
+    display: none; 
+}
+.todoFolderItem .todo-icon-modify{
+    display: none;
+}
+.todoFolderItem .todo-icon-modify.active{
+    display: inline-block;
+    fill:#999;
+    width:20px;
+    height:20px;
+}
+.todoFolderItem .todo-icon-modify.active:hover{
+    fill:#000;
+}
+.todoFolderItem .todoFolderName{
+    flex:1;
+
 }

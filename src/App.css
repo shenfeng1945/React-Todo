@@ -1,37 +1,148 @@
+.icon.icon-small {
+    width: 20px;
+    height: 20px;
+}
+
 .App {
     display: flex;
+    height:100%;
 }
-.aside{
-    width:278px;
-    border:1px solid red;
-    height:100vh;
-    position: relative;
-}
-.aside > .createFolderAction{
-    position: absolute;
+
+.aside {
+    width: 278px;
+    height: 100vh;
+    border-right: 1px solid #ddd;
+    position: fixed;
+    top:0;
+    left:0;
     bottom:0;
-    width:100%;
-    cursor:pointer;
-    border-top:1px solid;
+    background: rgba(229, 226, 250, .5);
 }
 
+.aside > .user {
+    display: flex;
+    align-items: center;
+    padding: 6px 0;
+    border-top: 1px solid rgba(0, 0, 0, .2);
+    border-bottom: 1px solid rgba(0, 0, 0, .2);
 
-
-section.content{
-    flex:1;
 }
-.content ol.todoItem{
+
+.aside > .user > .user-head > .icon {
+    fill: #db4c3f;
+
+}
+
+.aside > .user > .username {
+    flex: 1;
+}
+
+.aside > .user > .logout > .icon {
+    cursor: pointer;
+    fill: #bbb;
+}
+
+.aside > .user > .logout > .icon:hover {
+    fill: #000;
+}
+
+.aside > .createFolderAction {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    cursor: pointer;
+    border-top: 1px solid rgba(0, 0, 0, .2);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+}
+
+section.content {
+    min-height:100vh;
+    flex: 1;
+    position:relative;
+    margin-left:278px;
+    background: rgba(229, 226, 250, .5);
+    padding-top:50px;
+    padding-bottom:60px;
+}
+
+.content > .todo-head {
+    position: fixed;
+    top:0;
+    right:0;
+    left:278px;
+    font-size: 20px;
+    color: #e0eefa;
+    padding: 13px;
+    background: rgb(33, 150, 243);
+    text-align: center;
+    box-shadow: 0 0 3px rgba(0, 0, 0, .5);
+}
+
+.content > .inputWrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 90%;
+    margin: 10px auto;
+    background: rgba(33, 150, 243, .6);
+    padding: 10px 0;
+    border-radius: 5px;
+}
+
+.content > .inputWrapper > input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    padding: 8px;
+    color: #fcfdfc;
+
+}
+
+.content > .inputWrapper > input::placeholder {
+    color: #fcfdfc;
+}
+
+.content > .inputWrapper > .icon {
+    fill: #fcfdfc;
+}
+
+.content > .todoItem-Info {
+    width: 85%;
+    margin:0 auto;
+}
+
+.content ol.todoItems {
     display: none;
 }
-.content ol.todoItem.active{
+.content ol.todoItems.active {
     display: block;
 }
-.content .todoItemState{
+.content .todoItemState {
     display: flex;
+    position:fixed;
+    bottom:0;
+    right:0;
+    left:278px;
+    /*background: rgb(229, 226, 250);*/
+    z-index:1;
+    background:#f3ebfe;
+
 }
-.content .todoItemState a.links{
-   margin:0 5px;
+.content .todoItemState a.state {
+    margin: 0 5px;
+    text-decoration: none;
+    padding:12px 0;
+    border-radius:20px;
+    flex:1;
+    text-align:center;
 }
-.content .todoItemState a.links.active{
-   color:red;
+.content .todoItemState a.state:hover {
+    color: rgb(0, 176, 255);
+}
+.content .todoItemState a.state.active {
+    color: rgb(0, 176, 255);
 }
