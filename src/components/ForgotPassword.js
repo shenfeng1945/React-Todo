@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import './ForgotPassword.css'
+import '../modules/css/ForgotPassword.css'
 
 export default class ForgotPassword extends Component {
     render() {

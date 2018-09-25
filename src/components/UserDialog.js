@@ -1,7 +1,7 @@
 import React, {Component} from 'react'
 import SignInOrSignUpForm from './SignInOrSignUpForm'
 import ForgotPassword from './ForgotPassword'
-import './UserDialog.css'
+import '../modules/css/UserDialog.css'
 import {sendPassword,signUp,signIn} from './leancloud'
 import {copyByJSON} from "./copyByJSON";
 export default class UserDialog extends Component {

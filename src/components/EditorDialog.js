@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import $ from 'jquery';
-import './EditorDialog.css'
+import '../modules/css/EditorDialog.css'
 
 export default class EditorDialog extends Component {
     constructor(props) {

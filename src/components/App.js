@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
-import './App.css'
-import './reset.css'
+import '../modules/css/App.css'
+import '../modules/css/reset.css'
 import UserDialog from './UserDialog'
 import 'normalize.css'
 import {getCurrentUser, signOut, TodoModel, GroupModel} from "./leancloud"

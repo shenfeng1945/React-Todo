@@ -1,5 +1,5 @@
 import React, {Component} from 'react'
-import './Weather.css'
+import '../modules/css/Weather.css'
 
 export default class Weather extends Component {
     render() {

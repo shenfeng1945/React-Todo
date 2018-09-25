@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import $ from 'jquery';
-import './CreateDialog.css';
+import '../modules/css/CreateDialog.css';
 
 export default class CreateDialog extends Component {
     constructor(props) {

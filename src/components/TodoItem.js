@@ -1,5 +1,5 @@
 import React,{Component} from 'react'
-import './TodoItem.css'
+import '../modules/css/TodoItem.css'
 import moment from 'moment'
 export default class TodoItem extends Component {
     render(){
